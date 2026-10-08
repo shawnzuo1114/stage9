@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="900" viewBox="0 0 1500 900" role="img" aria-labelledby="title desc">
+  <title id="title">Stage9-HTFR actual execution architecture</title>
+  <desc id="desc">Shared VMamba, IR-SRM and STH main branch with a hierarchical temporal-frequency residual branch and retrieval head.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#475569"/></marker>
+    <style>.box{stroke-width:2}.t{font:15px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#172033;text-anchor:middle}.small{font-size:13px}.group{stroke-width:2;stroke-dasharray:8 6}.edge{fill:none;stroke:#475569;stroke-width:2;marker-end:url(#arrow)}.label{font:12px 'Microsoft YaHei','Noto Sans CJK SC',sans-serif;fill:#475569;text-anchor:middle}</style>
+  </defs>
+  <rect width="1500" height="900" fill="#FFFFFF"/>
+  <rect class="group" x="15" y="45" width="1470" height="205" rx="20" fill="#F8FAFC" stroke="#94A3B8"/><text class="t" x="230" y="72">Shared backbone + structure/temporal refinement</text>
+  <rect class="group" x="425" y="290" width="1060" height="420" rx="20" fill="#FFFBEB" stroke="#F59E0B"/><text class="t" x="600" y="318">Stage9 HTFR frequency residual path</text>
+  <rect class="group" x="1025" y="730" width="460" height="150" rx="20" fill="#F0FDF4" stroke="#22C55E"/><text class="t" x="1135" y="755">Final representation</text>
+
+  <g class="edge"><path d="M195 145H230"/><path d="M410 145H440"/><path d="M660 145H710"/><path d="M930 145H990"/><path d="M1210 145H1305"/></g>
+  <path class="edge" d="M550 193C620 255 930 250 1040 193"/><text class="label" x="790" y="250">H3 hubs</text>
+  <g class="edge"><path d="M550 193V332"/><path d="M820 193V332"/><path d="M550 398V452"/><path d="M820 398V452"/><path d="M550 518V572"/><path d="M820 518V572"/><path d="M655 615H985"/><path d="M925 635H985"/><path d="M1215 615H1260"/><path d="M1370 660C1370 710 1260 720 1200 735"/><path d="M1330 770H1335"/></g>
+  <path class="edge" d="M1370 178C1290 300 650 300 610 572"/><text class="label" x="955" y="288">z_g identity query</text>
+  <path class="edge" d="M1370 178C1340 320 920 355 875 572"/>
+  <path class="edge" d="M1370 178C1280 360 1160 430 1100 575"/><text class="label" x="1240" y="410">condition</text>
+  <path class="edge" d="M1370 178V570"/><text class="label" x="1415" y="395">base</text>
+  <path class="edge" d="M1370 178C1450 430 1350 675 1245 735"/><text class="label" x="1438" y="520">residual base</text>
+
+  <g><rect class="box" x="25" y="110" width="170" height="70" rx="12" fill="#E0F2FE" stroke="#0284C7"/><text class="t" x="110" y="137"><tspan x="110">RGB + IR clips</tspan><tspan class="small" x="110" dy="22">[B,12,3,288,144]</tspan></text></g>
+  <g><rect class="box" x="230" y="110" width="180" height="70" rx="12" fill="#E0F2FE" stroke="#0284C7"/><text class="t" x="320" y="137"><tspan x="320">Shared VMamba-Tiny</tspan><tspan class="small" x="320" dy="22">Stage1–Stage2</tspan></text></g>
+  <g><rect class="box" x="440" y="98" width="220" height="95" rx="12" fill="#DBEAFE" stroke="#2563EB"/><text class="t small" x="550" y="124"><tspan x="550">Stage3 blocks</tspan><tspan x="550" dy="20">SIE3 → IR-SRM3 → STH3</tspan><tspan x="550" dy="20">F3 [B,T,384,18,9]</tspan></text></g>
+  <g><rect class="box" x="710" y="98" width="220" height="95" rx="12" fill="#DBEAFE" stroke="#2563EB"/><text class="t small" x="820" y="124"><tspan x="820">Stage4 blocks</tspan><tspan x="820" dy="20">SIE4 → IR-SRM4 → STH4</tspan><tspan x="820" dy="20">F4 [B,T,768,9,5]</tspan></text></g>
+  <g><rect class="box" x="990" y="98" width="220" height="95" rx="12" fill="#DCFCE7" stroke="#16A34A"/><text class="t small" x="1100" y="124"><tspan x="1100">STH Video Aggregator</tspan><tspan x="1100" dy="20">Stage4 GeM + H3/H4</tspan><tspan x="1100" dy="20">LayerNorm</tspan></text></g>
+  <g><rect class="box" x="1305" y="112" width="130" height="66" rx="12" fill="#DCFCE7" stroke="#16A34A"/><text class="t" x="1370" y="139"><tspan x="1370">z_g</tspan><tspan class="small" x="1370" dy="21">[B,512]</tspan></text></g>
+
+  <g><rect class="box" x="455" y="332" width="190" height="66" rx="12" fill="#FEF3C7" stroke="#D97706"/><text class="t small" x="550" y="359"><tspan x="550">Spatial Haar HF3</tspan><tspan x="550" dy="20">fixed GeM p=3</tspan></text></g>
+  <g><rect class="box" x="725" y="332" width="190" height="66" rx="12" fill="#FEF3C7" stroke="#D97706"/><text class="t small" x="820" y="359"><tspan x="820">Spatial Haar HF4</tspan><tspan x="820" dy="20">fixed GeM p=3</tspan></text></g>
+  <g><rect class="box" x="455" y="452" width="190" height="66" rx="12" fill="#FFEDD5" stroke="#EA580C"/><text class="t small" x="550" y="479"><tspan x="550">Temporal FFT HPF3</tspan><tspan x="550" dy="20">mask [0,.25,1,…]</tspan></text></g>
+  <g><rect class="box" x="725" y="452" width="190" height="66" rx="12" fill="#FFEDD5" stroke="#EA580C"/><text class="t small" x="820" y="479"><tspan x="820">Temporal FFT HPF4</tspan><tspan x="820" dy="20">mask [0,.25,1,…]</tspan></text></g>
+  <g><rect class="box" x="445" y="572" width="210" height="86" rx="12" fill="#F3E8FF" stroke="#9333EA"/><text class="t small" x="550" y="597"><tspan x="550">Token projection</tspan><tspan x="550" dy="20">Identity temporal router</tspan><tspan x="550" dy="20">→ v3 [B,512]</tspan></text></g>
+  <g><rect class="box" x="715" y="572" width="210" height="86" rx="12" fill="#F3E8FF" stroke="#9333EA"/><text class="t small" x="820" y="597"><tspan x="820">Token projection</tspan><tspan x="820" dy="20">Identity temporal router</tspan><tspan x="820" dy="20">→ v4 [B,512]</tspan></text></g>
+  <g><rect class="box" x="985" y="575" width="230" height="80" rx="12" fill="#F3E8FF" stroke="#9333EA"/><text class="t small" x="1100" y="605"><tspan x="1100">Hierarchical stage router</tspan><tspan x="1100" dy="22">π3, π4 → v_freq [B,512]</tspan></text></g>
+  <g><rect class="box" x="1260" y="570" width="220" height="90" rx="12" fill="#FCE7F3" stroke="#DB2777"/><text class="t small" x="1370" y="593"><tspan x="1370">Bounded channel gate</tspan><tspan x="1370" dy="20">g=0.2·sigmoid(logits)</tspan><tspan x="1370" dy="20">δ=g⊙LN(MLP(v_freq))</tspan></text></g>
+  <g><rect class="box" x="1070" y="735" width="260" height="70" rx="12" fill="#DCFCE7" stroke="#16A34A"/><text class="t small" x="1200" y="763"><tspan x="1200">z_final = LN(z_g + w(e)δ)</tspan><tspan x="1200" dy="21">[B,512]</tspan></text></g>
+  <g><rect class="box" x="1335" y="725" width="150" height="90" rx="12" fill="#E0E7FF" stroke="#4F46E5"/><text class="t small" x="1410" y="749"><tspan x="1410">RetrievalHead</tspan><tspan x="1410" dy="19">512→2048→BN</tspan><tspan x="1410" dy="19">ID + L2 feature</tspan></text></g>
+</svg>

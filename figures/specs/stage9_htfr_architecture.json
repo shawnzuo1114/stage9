@@ -1,0 +1,51 @@
+{
+  "canvas": {"width": 1500, "height": 900},
+  "nodes": [
+    {"id": "input", "label": "RGB + IR clips\n[B,12,3,288,144]", "x": 110, "y": 145, "width": 170, "height": 70, "shape": "rounded", "fill": "#E0F2FE", "stroke": "#0284C7"},
+    {"id": "vmamba", "label": "Shared VMamba-Tiny\nStage1–Stage2", "x": 320, "y": 145, "width": 180, "height": 70, "shape": "rounded", "fill": "#E0F2FE", "stroke": "#0284C7"},
+    {"id": "s3", "label": "Stage3 blocks\nSIE3 → IR-SRM3 → STH3\nF3: [B,T,384,18,9]", "x": 550, "y": 145, "width": 220, "height": 95, "shape": "rounded", "fill": "#DBEAFE", "stroke": "#2563EB"},
+    {"id": "s4", "label": "Stage4 blocks\nSIE4 → IR-SRM4 → STH4\nF4: [B,T,768,9,5]", "x": 820, "y": 145, "width": 220, "height": 95, "shape": "rounded", "fill": "#DBEAFE", "stroke": "#2563EB"},
+    {"id": "sthagg", "label": "STH Video Aggregator\nStage4 GeM + H3/H4 hubs\nLayerNorm", "x": 1100, "y": 145, "width": 220, "height": 95, "shape": "rounded", "fill": "#DCFCE7", "stroke": "#16A34A"},
+    {"id": "zg", "label": "z_g\n[B,512]", "x": 1370, "y": 145, "width": 130, "height": 65, "shape": "rounded", "fill": "#DCFCE7", "stroke": "#16A34A"},
+
+    {"id": "haar3", "label": "Spatial Haar HF3\nfixed GeM p=3", "x": 550, "y": 365, "width": 190, "height": 65, "shape": "rounded", "fill": "#FEF3C7", "stroke": "#D97706"},
+    {"id": "haar4", "label": "Spatial Haar HF4\nfixed GeM p=3", "x": 820, "y": 365, "width": 190, "height": 65, "shape": "rounded", "fill": "#FEF3C7", "stroke": "#D97706"},
+    {"id": "fft3", "label": "Temporal FFT HPF3\nmask [0,.25,1,…]", "x": 550, "y": 485, "width": 190, "height": 65, "shape": "rounded", "fill": "#FFEDD5", "stroke": "#EA580C"},
+    {"id": "fft4", "label": "Temporal FFT HPF4\nmask [0,.25,1,…]", "x": 820, "y": 485, "width": 190, "height": 65, "shape": "rounded", "fill": "#FFEDD5", "stroke": "#EA580C"},
+    {"id": "route3", "label": "Token projection\nIdentity temporal router\n→ v3 [B,512]", "x": 550, "y": 615, "width": 210, "height": 85, "shape": "rounded", "fill": "#F3E8FF", "stroke": "#9333EA"},
+    {"id": "route4", "label": "Token projection\nIdentity temporal router\n→ v4 [B,512]", "x": 820, "y": 615, "width": 210, "height": 85, "shape": "rounded", "fill": "#F3E8FF", "stroke": "#9333EA"},
+    {"id": "stage_router", "label": "Hierarchical stage router\nπ3, π4 → v_freq [B,512]", "x": 1100, "y": 615, "width": 230, "height": 80, "shape": "rounded", "fill": "#F3E8FF", "stroke": "#9333EA"},
+    {"id": "gate", "label": "Bounded channel gate\ng=0.2·sigmoid(logits)\nδ=g⊙LN(MLP(v_freq))", "x": 1370, "y": 615, "width": 220, "height": 90, "shape": "rounded", "fill": "#FCE7F3", "stroke": "#DB2777"},
+    {"id": "fusion", "label": "z_final = LN(z_g + w(e)δ)\n[B,512]", "x": 1200, "y": 770, "width": 260, "height": 70, "shape": "rounded", "fill": "#DCFCE7", "stroke": "#16A34A"},
+    {"id": "head", "label": "RetrievalHead\nLinear 512→2048 → BN\nID logits + L2 test feature", "x": 1410, "y": 770, "width": 150, "height": 90, "shape": "rounded", "fill": "#E0E7FF", "stroke": "#4F46E5"}
+  ],
+  "edges": [
+    {"from": "input", "to": "vmamba"},
+    {"from": "vmamba", "to": "s3"},
+    {"from": "s3", "to": "s4"},
+    {"from": "s4", "to": "sthagg"},
+    {"from": "s3", "to": "sthagg", "label": "H3", "curve": true},
+    {"from": "sthagg", "to": "zg"},
+    {"from": "s3", "to": "haar3"},
+    {"from": "s4", "to": "haar4"},
+    {"from": "haar3", "to": "fft3"},
+    {"from": "haar4", "to": "fft4"},
+    {"from": "fft3", "to": "route3"},
+    {"from": "fft4", "to": "route4"},
+    {"from": "route3", "to": "stage_router"},
+    {"from": "route4", "to": "stage_router"},
+    {"from": "zg", "to": "route3", "label": "identity query", "curve": true},
+    {"from": "zg", "to": "route4", "label": "identity query", "curve": true},
+    {"from": "zg", "to": "stage_router", "label": "condition", "curve": true},
+    {"from": "stage_router", "to": "gate"},
+    {"from": "zg", "to": "gate", "label": "base", "curve": true},
+    {"from": "gate", "to": "fusion"},
+    {"from": "zg", "to": "fusion", "label": "residual base", "curve": true},
+    {"from": "fusion", "to": "head"}
+  ],
+  "groups": [
+    {"label": "Shared backbone + structure/temporal refinement", "node_ids": ["input", "vmamba", "s3", "s4", "sthagg", "zg"], "fill": "#F8FAFC", "stroke": "#94A3B8"},
+    {"label": "Stage9 HTFR frequency residual path", "node_ids": ["haar3", "haar4", "fft3", "fft4", "route3", "route4", "stage_router", "gate"], "fill": "#FFFBEB", "stroke": "#F59E0B"},
+    {"label": "Final representation and retrieval", "node_ids": ["fusion", "head"], "fill": "#F0FDF4", "stroke": "#22C55E"}
+  ]
+}
